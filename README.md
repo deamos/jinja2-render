@@ -1,7 +1,8 @@
-# jinja2-render
-*A Python Tool to Render Jinja2 Templates on the Command Line with Different Contexts*
+# jinja2-render-json
+*A Python Tool to Render Jinja2 Templates on the Command Line*
+Fork of jinja2-render (https://github.com/pklaus/jinja2-render)
 
-**jinja2-render** hugely simplifies creating different versions of a text file.
+**jinja2-render-json** hugely simplifies creating different versions of a text file.
 It takes a jinja2 Template file as input and renders it to a final document
 using a context loaded from a Python script.
 It was invented for use with Dockerfiles but its use case goes far beyond.
@@ -17,7 +18,6 @@ This is useful for example in the following cases:
 
 ```
                      jinja2-render
-                    (& contexts.py)
                           ↓
 
 Jinja2 Template File            Rendered File
@@ -35,15 +35,11 @@ usage: jinja2-render [-h] [-c CONTEXTS] [-f TEMPLATE]
 
 Render a Jinja2 template from the command line.
 
-positional arguments:
-  which        Context to choose. Omit for a list of contexts
-               available in the contexts file (-c).
-               (default: None)
-
 optional arguments:
   -h, --help   show this help message and exit
-  -c CONTEXTS  The Python file defining the contexts to
-               render the template. (default: ./contexts.py)
+  -c CONTEXTS  The JSON String defining the contexts to
+               render the template. (default: '{}')
+               Example  '{"egg":"chicken","itemList":["test","test2","test3"]}'
   -f TEMPLATE  The Jinja2 template to use. (default:
                Dockerfile.jinja2)
   -o OUTPUT    The output file to write to. (default:
@@ -64,16 +60,9 @@ RUN echo "Done!"
 
 ```
 
-Content of `contexts.py`:
-
-```python
-CONTEXTS = {
-    "v1.0": {
-        "base_img": "debian:10-slim",
-        "packages": ["glibc-devel", "turboshutdown"],
-    }
-}
-
+Content of JSON:
+```json
+'{"v1.0": {"base_img": "debian:10-slim", "packages": ["glibc-devel", "turboshutdown"]}'}
 ```
 
 Call to `jinja2-render`:
@@ -92,20 +81,6 @@ RUN apt-get update \
 
 RUN echo "Done!"
 ```
-
-### The Contexts File
-
-The contexts file (defaults to `./contexts.py`) contains
-one ore multiple context definitions to render the template.
-This includes variables to be substituted, lists to render for loops, etc.
-
-* The contexts file **must** contain a global `CONTEXTS = {}`
-  with keys corresponding to different contexts that can be selected.
-  (*Pro Tip™*: Instead of a dictionary, this CONTEXTS object could also
-  be a class that derives from dict.)
-* The items in `CONTEXTS` are the actual context handed over to
-  [jinja2.Template.render()](https://jinja.palletsprojects.com/en/2.11.x/api/#jinja2.Template.render).
-  Usually this would also be a dictionary.
 
 ### Original Use Case
 
@@ -134,5 +109,7 @@ to validate the resulting context.
   *initial author*
 * Florian Feldbauer, University Bochum  
   *further improvements*
+* Deamos
+  *Alterations to use JSON, instead of a contexts file*  
 
 [Jinja2 For Loop]: https://jinja.palletsprojects.com/en/2.11.x/templates/#for
